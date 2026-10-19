@@ -125,7 +125,7 @@ def test_extinct_prehistoric_and_deficient_are_not_served(client):
 
 
 def test_unknown_species_and_order(client):
-        assert client.get("/species/Not a mammal").status_code == 404
+    assert client.get("/species/Not a mammal").status_code == 404
     missing = client.get("/watchlist", params={"order": "NotAnOrder", "n": 5})
     assert missing.status_code == 404
 
