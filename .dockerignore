@@ -1,0 +1,6 @@
+.venv
+data/cache
+artifacts
+.git
+**/__pycache__
+**/*.pyc
