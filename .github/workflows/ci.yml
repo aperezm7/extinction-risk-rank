@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: extinction
+          POSTGRES_PASSWORD: extinction
+          POSTGRES_DB: extinction
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U extinction -d extinction"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Test hidden solutions and the fixture service
+        env:
+          CHALLENGE_USE_HIDDEN: "1"
+          DATABASE_URL: postgresql://extinction:extinction@localhost:5432/extinction
+        run: pytest
+      - name: Train the committed PHYLACINE table without a download
+        run: python -m services.model.train --species tests/fixtures/mammals.csv

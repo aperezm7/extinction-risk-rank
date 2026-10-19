@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: extinction
+      POSTGRES_PASSWORD: extinction
+      POSTGRES_DB: extinction
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U extinction -d extinction"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    ports:
+      - "5439:5432"
+
+  gateway:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://extinction:extinction@db:5432/extinction
+      SPECIES_CSV: /app/tests/fixtures/mammals.csv
+    ports:
+      - "8091:8091"
+    depends_on:
+      db:
+        condition: service_healthy
